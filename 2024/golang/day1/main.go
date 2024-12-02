@@ -69,4 +69,21 @@ func main() {
 	}
 
 	fmt.Printf("The total distance between left and right columns is: %.2f\n", sum)
+	find := map[int]int{}
+
+	for _, v := range leftColumn {
+		find[v] = 0
+	}
+	for _, v := range rightColumn {
+		count, ok := find[v]
+		if ok {
+			find[v] = count + 1
+		}
+	}
+
+	similarityScore := 0
+	for value, count := range find {
+		similarityScore += value * count
+	}
+	fmt.Printf("The similarity Score between left and right columns is: %v\n", similarityScore)
 }

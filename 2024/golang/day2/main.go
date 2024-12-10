@@ -10,30 +10,50 @@ import (
 	"strings"
 )
 
-func IsSafeReport(report []string) bool {
-	isSafeReport := true
+func TryRemoveToBeSafe(report []int) bool {
+	for index := 0; index < len(report); index++ {
+		current := make([]int, len(report))
+		copy(current, report)
+
+		ok := IsSafeReport(append(current[:index], current[index+1:]...))
+		if ok {
+			return true
+		}
+	}
+
+	return false
+}
+
+func ConvertReport(report []string) []int {
+	var result []int
+	for _, value := range report {
+		vInt, _ := strconv.Atoi(value)
+		result = append(result, vInt)
+	}
+
+	return result
+}
+
+func IsSafeReport(report []int) bool {
 	isDecreasing := false
 
 	for i := 0; i < len(report)-1; i++ {
-		lv, _ := strconv.Atoi(report[i])
-		nextLv, _ := strconv.Atoi(report[i+1])
+		lv := report[i]
+		nextLv := report[i+1]
 		diff := nextLv - lv
 		absDiff := int(math.Abs(float64(diff)))
 
 		if absDiff == 0 || absDiff > 3 {
-			isSafeReport = false
-			break
-		} else {
-			if i == 0 && diff < 0 {
-				isDecreasing = true
-			}
-			if (isDecreasing && diff > 0) || (!isDecreasing && diff < 0) {
-				return false
-			}
+			return false
+		}
+		if i == 0 && diff < 0 {
+			isDecreasing = true
+		}
+		if (isDecreasing && diff > 0) || (!isDecreasing && diff < 0) {
+			return false
 		}
 	}
-
-	return isSafeReport
+	return true
 }
 
 func main() {
@@ -51,9 +71,9 @@ func main() {
 	safeReports := 0
 
 	for scanner.Scan() {
-		report := strings.Fields(scanner.Text())
-
-		if IsSafeReport(report) {
+		result := strings.Fields(scanner.Text())
+		report := ConvertReport(result)
+		if TryRemoveToBeSafe(report) {
 			safeReports += 1
 		}
 	}

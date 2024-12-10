@@ -7,35 +7,43 @@ import (
 func TestIsSafeReport(t *testing.T) {
 	type TestCase struct {
 		description   string
-		input         []string
+		input         []int
 		expectedError bool
 	}
-
 	for _, scenario := range []TestCase{
 		{
-			description:   "Safe because the levels are all decreasing by 1 or 2.",
-			input:         []string{"7", "6", "4", "2", "1"},
+			description:   "Safe without removing any level.",
+			input:         []int{7, 6, 4, 2, 1},
 			expectedError: false,
 		},
 		{
-			description:   "Unsafe because 2 7 is an increase of 5",
-			input:         []string{"1", "2", "7", "8", "9"},
+			description:   "Unsafe regardless of which level is removed.",
+			input:         []int{1, 2, 7, 8, 9},
 			expectedError: true,
 		},
 		{
-			description:   " Unsafe because 6 2 is a decrease of 4.",
-			input:         []string{"9", "7", "6", "2", "1"},
+			description:   "Unsafe regardless of which level is removed.",
+			input:         []int{9, 7, 6, 2, 1},
 			expectedError: true,
 		},
-
 		{
-			description:   "Unsafe because 1 3 is increasing but 3 2 is decreasing",
-			input:         []string{"1", "3", "2", "4", "5"},
-			expectedError: true,
+			description:   "Safe by removing the second level, 3.",
+			input:         []int{1, 3, 2, 4, 5},
+			expectedError: false,
+		},
+		{
+			description:   "Safe by removing the third level, 4.",
+			input:         []int{8, 6, 4, 4, 1},
+			expectedError: false,
+		},
+		{
+			description:   "Safe without removing any level.",
+			input:         []int{1, 3, 6, 7, 9},
+			expectedError: false,
 		},
 	} {
 		t.Run(scenario.description, func(t *testing.T) {
-			isSafe := IsSafeReport(scenario.input)
+			isSafe := TryRemoveToBeSafe(scenario.input)
 
 			if isSafe && scenario.expectedError || !isSafe && !scenario.expectedError {
 				t.Error(scenario.description)
